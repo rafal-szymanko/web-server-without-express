@@ -1,17 +1,34 @@
 const http = require('http');
+const fs = require('fs')
 
 const port = process.env.PORT || 8000;
 
 const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8'});
+
     if(req.url === "/") {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8'});
-      res.end("Strona główna");
+      fs.readFile('./pages/main.html', (err, main) => {
+        if(err) res.end();
+        res.end(main);
+      })
     } else if (req.url === '/posts') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8'});
-      res.end("posty");
+      fs.readFile('./pages/posts.html', (err, posts) => {
+        if(err) res.end('Error');
+        res.end(posts);
+      })
+    } else if (req.url === '/api/posts') {
+      res.writeHead(200, { 'Content-Type': 'application/json'});
+      fs.readFile('./db.json', (err, data) => {
+        if (err) res.end('Error');
+        res.end(data)
+      });
+      
     } else {
       res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8'});
-      res.end(`${res.statusCode}`);
+      fs.readFile('./pages/404.html', (err, notExist) => {
+        if(err) res.end('Error');
+        res.end(notExist);
+      })
     }
   });
 
